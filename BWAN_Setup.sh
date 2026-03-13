@@ -180,3 +180,4 @@ echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $PUBLIC_IP:9010"
 echo "=========================================="
 
+
