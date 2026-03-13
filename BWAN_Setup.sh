@@ -2,7 +2,7 @@
 
 # --- 0. Root Check ---
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root. Please run: sudo ./BWAN_Setup.sh"
+   echo "This script must be run as sudouser. Please run: sudo ./BWAN_Setup.sh"
    exit 1
 fi
 
@@ -16,13 +16,15 @@ read -p "Enter the physical network interface to bridge (e.g., ens160, enp0s3): 
 read -p "Enter the static IP for the bridge (e.g., 192.168.0.146/24): " BR_IP
 read -p "Enter the default gateway (e.g., 192.168.0.1): " BR_GW
 read -p "Enter the DNS servers (comma separated, e.g., 8.8.8.8, 1.1.1.1): " BR_DNS
+read -p "Enter the host system's vCPU count (minimum 4): " BR_CPU
+read -p "Enter the host system's RAM allocation in MB (minimum 8192): " BR_RAM
 read -p "Enter the Netplan filename to create (e.g., 01-netcfg.yaml): " NETPLAN_FILE
 
 # Ensures that normal user is being used, despite being in Superuser
 REAL_USER=${SUDO_USER:-$(whoami)}
 
 echo ""
-echo "Starting spinning..."
+echo "Starting spin..."
 
 # System Update 
 apt update -y
@@ -102,9 +104,9 @@ fi
 cat <<EOF > /home/infiot/kvm/edge.xml
 <domain type='kvm' id='50'>
    <name>edge2</name>
-   <memory unit='MB'>8192</memory>
-   <currentMemory unit='MB'>8192</currentMemory>
-   <vcpu placement='static'>4</vcpu>
+   <memory unit='MB'>$BR_RAM</memory>
+   <currentMemory unit='MB'>$BR_RAM</currentMemory>
+   <vcpu placement='static'>$BR_CPU</vcpu>
    <resource>
      <partition>/machine</partition>
    </resource>
@@ -180,7 +182,7 @@ PUBLIC_IP=$(curl -s -4 ifconfig.me)
 
 echo ""
 echo "=========================================="
-echo "            SETUP COMPLETE!               "
+echo "         AUTO_DEPLOY COMPLETE!            "
 echo "=========================================="
 echo "Your Edge2 VM has been created and started."
 echo "Bridge Internal IP : $BR_IP"
@@ -189,10 +191,10 @@ echo ""
 echo ">>> NEXT STEPS <<<"
 echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine."
 echo "2. Connect to the VM using the server's IP address and Port 9010."
-echo "   Format: $PUBLIC_IP:9010"
+echo "   Format: $BR_IP::9010"
 echo "=========================================="
 echo "Switching to your fully configured environment now..."
 
-# The magic handoff: Instantly drops the user into a fresh shell with all new permissions loaded
+
 exec su - "$REAL_USER"
 
