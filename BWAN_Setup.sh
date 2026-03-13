@@ -8,7 +8,7 @@ fi
 
 echo "=========================================="
 echo "    Netskope Automated BWAN Wizard        "
-echo "  By: Jordan Warren- ES Cyber Solutions   "
+echo "  By: Jordan Warren - ES Cyber Solutions  "
 echo "=========================================="
 
 # User Variable Input
@@ -182,5 +182,8 @@ echo ">>> NEXT STEPS <<<"
 echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine."
 echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $PUBLIC_IP:9010"
-echo "3. Run 'source ~/.bashrc' or restart your terminal to use virsh without sudo."
 echo "=========================================="
+echo "Switching to your fully configured environment now..."
+
+# The magic handoff: Instantly drops the user into a fresh shell with all new permissions loaded
+exec su - "$REAL_USER"
