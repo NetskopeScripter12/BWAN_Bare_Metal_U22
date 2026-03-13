@@ -47,6 +47,13 @@ usermod -aG kvm "$REAL_USER"
 usermod -aG libvirt "$REAL_USER"
 
 # Create Netplan YAML
+# 1. Clear old configs to prevent IP conflicts from previous runs
+rm -f /etc/netplan/*.yaml
+
+# 2. Extract the physical interface's true MAC address
+MAC_ADDR=$(cat /sys/class/net/$PHY_IFACE/address)
+
+# 3. Create Netplan YAML with the cloned MAC
 cat <<EOF > /etc/netplan/$NETPLAN_FILE
 network:
   version: 2
@@ -57,6 +64,7 @@ network:
   bridges:
     br0:
       interfaces: [$PHY_IFACE]
+      macaddress: $MAC_ADDR
       dhcp4: false
       addresses: [$BR_IP]
       routes:
@@ -187,3 +195,4 @@ echo "Switching to your fully configured environment now..."
 
 # The magic handoff: Instantly drops the user into a fresh shell with all new permissions loaded
 exec su - "$REAL_USER"
+
