@@ -2,7 +2,7 @@
 
 # --- 0. Root Check ---
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root. Please run: sudo ./setup_edge.sh"
+   echo "This script must be run as root. Please run: sudo ./BWAN_Setup.sh"
    exit 1
 fi
 
