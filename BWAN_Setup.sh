@@ -165,6 +165,9 @@ EOF
 su - "$REAL_USER" -c "virsh --connect qemu:///system define /home/infiot/kvm/edge.xml"
 su - "$REAL_USER" -c "virsh --connect qemu:///system start edge2"
 
+# Set default virsh URI for the user so they do not need to use sudo to see the VM
+su - "$REAL_USER" -c "grep -q 'LIBVIRT_DEFAULT_URI' ~/.bashrc || echo \"export LIBVIRT_DEFAULT_URI='qemu:///system'\" >> ~/.bashrc"
+
 PUBLIC_IP=$(curl -s -4 ifconfig.me)
 
 echo ""
@@ -179,4 +182,5 @@ echo ">>> NEXT STEPS <<<"
 echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine."
 echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $PUBLIC_IP:9010"
+echo "3. Run 'source ~/.bashrc' or restart your terminal to use virsh without sudo."
 echo "=========================================="
