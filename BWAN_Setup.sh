@@ -161,10 +161,9 @@ cat <<EOF > /home/infiot/kvm/edge.xml
 </domain>
 EOF
 
-# Define and Start VM
-virsh define /home/infiot/kvm/edge.xml
-virsh start edge2
-
+# Define and Start VM as the non-sudo user
+su - "$REAL_USER" -c "virsh --connect qemu:///system define /home/infiot/kvm/edge.xml"
+su - "$REAL_USER" -c "virsh --connect qemu:///system start edge2"
 
 PUBLIC_IP=$(curl -s -4 ifconfig.me)
 
@@ -181,6 +180,3 @@ echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine.
 echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $PUBLIC_IP:9010"
 echo "=========================================="
-
-
-
