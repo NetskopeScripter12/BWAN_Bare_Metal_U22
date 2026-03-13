@@ -7,26 +7,27 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 echo "=========================================="
-echo "    KVM & Infiot Edge VM Setup Script     "
+echo "    Netskope Automated BWAN Wizard        "
+echo "  By: Jordan Warren- ES Cyber Solutions   "
 echo "=========================================="
 
-# --- Collect Variables ---
+# User Variable Input
 read -p "Enter the physical network interface to bridge (e.g., ens160, enp0s3): " PHY_IFACE
 read -p "Enter the static IP for the bridge (e.g., 192.168.0.146/24): " BR_IP
 read -p "Enter the default gateway (e.g., 192.168.0.1): " BR_GW
 read -p "Enter the DNS servers (comma separated, e.g., 8.8.8.8, 1.1.1.1): " BR_DNS
 read -p "Enter the Netplan filename to create (e.g., 01-netcfg.yaml): " NETPLAN_FILE
 
-# Determine the actual user running sudo to add to libvirt groups
+# Ensures that normal user is being used, despite being in Superuser
 REAL_USER=${SUDO_USER:-$(whoami)}
 
 echo ""
-echo "Starting setup..."
+echo "Starting spinning..."
 
-# --- 1. System Update ---
+# System Update 
 apt update -y
 
-# --- 2. Virtualization Check ---
+# KVM Check
 VIRT_CHECK=$(egrep -c '(vmx|svm)' /proc/cpuinfo)
 if [ "$VIRT_CHECK" -eq 0 ]; then
     echo "ERROR: Virtualization is not supported or enabled in the BIOS/Hypervisor."
@@ -34,18 +35,18 @@ if [ "$VIRT_CHECK" -eq 0 ]; then
 fi
 echo "Virtualization check passed."
 
-# --- 3. Install Dependencies ---
+# Install Dependencies
 apt install -y qemu-kvm virt-manager libvirt-daemon-system libvirt-clients bridge-utils virtinst ovmf ifenslave nano
 
-# --- 4. Start & Enable Libvirt ---
+# Enable Libvirt
 systemctl enable --now libvirtd
 systemctl start libvirtd
 
-# --- 5 & 6. Add User to Groups ---
+# Add "real" User to Groups
 usermod -aG kvm "$REAL_USER"
 usermod -aG libvirt "$REAL_USER"
 
-# --- 7 & 8. Create Netplan YAML ---
+# Create Netplan YAML
 cat <<EOF > /etc/netplan/$NETPLAN_FILE
 network:
   version: 2
@@ -65,29 +66,29 @@ network:
         addresses: [$BR_DNS]
 EOF
 
-# --- 9. Apply Netplan ---
+# Apply Netplan
 netplan apply
 
-# --- 13 & 14. Setup Directories ---
+
 mkdir -p /home/infiot/kvm
 cd /home/infiot/kvm/
 
-# --- 16. Download Disk Image ---
+# Download BWAN Image
 IMAGE_URL="https://storage.googleapis.com/infiotimagesdev/user-pramode-elsa-kvm-performance/fc15e46/fc15e46-infiot-amd64-vmdk-diskimage.qcow2"
 wget -O fc15e46-infiot-amd64-vmdk-diskimage.qcow2 "$IMAGE_URL"
 
-# --- 16.5 & 16.9. Set Ownership and Permissions ---
+# Set Ownership and eXecutable
 chown libvirt-qemu:kvm /home/infiot/kvm/fc15e46-infiot-amd64-vmdk-diskimage.qcow2
 chmod 664 /home/infiot/kvm/fc15e46-infiot-amd64-vmdk-diskimage.qcow2
 
-# --- 16.99. AppArmor Fix ---
-# Check if the rule already exists to prevent duplicate entries if script is run twice
+# AppArmor Fix
+# rule duplication checker
 if ! grep -q "/home/infiot/kvm/\*\* rwk," /etc/apparmor.d/libvirt/TEMPLATE.qemu; then
     sed -i '/^}/i \  /home/infiot/kvm/** rwk,' /etc/apparmor.d/libvirt/TEMPLATE.qemu
     systemctl restart apparmor
 fi
 
-# --- 17. Create edge.xml ---
+# Create edge.xml
 cat <<EOF > /home/infiot/kvm/edge.xml
 <domain type='kvm' id='50'>
    <name>edge2</name>
@@ -158,16 +159,16 @@ cat <<EOF > /home/infiot/kvm/edge.xml
 </domain>
 EOF
 
-# --- 18 & 19. Define and Start VM ---
+# Define and Start VM
 virsh define /home/infiot/kvm/edge.xml
 virsh start edge2
 
-# --- 20. Final Instructions ---
+
 PUBLIC_IP=$(curl -s -4 ifconfig.me)
 
 echo ""
 echo "=========================================="
-echo "          SETUP COMPLETE!                 "
+echo "            SETUP COMPLETE!               "
 echo "=========================================="
 echo "Your Edge2 VM has been created and started."
 echo "Bridge Internal IP : $BR_IP"
@@ -178,3 +179,4 @@ echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine.
 echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $PUBLIC_IP:9010"
 echo "=========================================="
+
