@@ -69,6 +69,8 @@ EOF
 # Apply Netplan
 netplan apply
 
+echo "Waiting for network bridge to initialize..."
+sleep 60
 
 mkdir -p /home/infiot/kvm
 cd /home/infiot/kvm/
@@ -179,5 +181,6 @@ echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine.
 echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $PUBLIC_IP:9010"
 echo "=========================================="
+
 
 
