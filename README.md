@@ -3,7 +3,7 @@ This is an automated script to set up BWAN Baremetal on Ubuntu 22.
 **THIS SCRIPT IS IN ALPHA TESTING. YOU ASSUME ALL RISK WITHOUT WARRANTY FOR USE. Changing, altering, or deleting the author's name is prohibited. Script has no official affiliation with Netskope; all rights reserved.**
 
 
-#Prerequisites
+# Prerequisites
  - Machine ***MUST*** support Virtulization
  - Must be using Ubuntu 22.4 or 18
  - Must have KVM installed, see (https://linuxgenie.net/how-to-install-kvm-on-ubuntu-22-04/) for Ubuntu 22.04 and (https://linuxize.com/post/how-to-install-kvm-on-ubuntu-18-04/) for Ubuntu 18.04
