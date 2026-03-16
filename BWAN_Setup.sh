@@ -194,7 +194,7 @@ echo "1. Download a VNC Viewer (like RealVNC or TightVNC) on your local machine.
 echo "2. Connect to the VM using the server's IP address and Port 9010."
 echo "   Format: $BR_IP::9010"
 echo "=========================================="
-echo "Switching to your fully configured environment now..."
+echo "$GW_NAME environment is ready for configuration! Thanks for choosing ES Cyber Solutions!"
 
 
 exec su - "$REAL_USER"
