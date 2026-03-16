@@ -17,7 +17,7 @@ This is an automated script to set up BWAN Baremetal on Ubuntu 22.
 1) Clone the repository via git clone
 2) Once installed, cd into the BWAN_BARE_METAL_U22 directory
 ```bash
-cd BWAN_BARE_METAL_U22
+cd BWAN_Bare_Metal_U22
 ```
 3) Make the script executable
 ```bash
