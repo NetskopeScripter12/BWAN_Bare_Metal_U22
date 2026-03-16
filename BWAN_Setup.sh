@@ -12,6 +12,7 @@ echo "  By: Jordan Warren - ES Cyber Solutions  "
 echo "=========================================="
 
 # User Variable Input
+read -p "Enter the name of your Gateway (e.g. Edge1, Hub2, Spoke1): " GW_NAME
 read -p "Enter the physical network interface to bridge (e.g., ens160, enp0s3): " PHY_IFACE
 read -p "Enter the static IP for the bridge (e.g., 192.168.0.146/24): " BR_IP
 read -p "Enter the default gateway (e.g., 192.168.0.1): " BR_GW
@@ -103,7 +104,7 @@ fi
 # Create edge.xml
 cat <<EOF > /home/infiot/kvm/edge.xml
 <domain type='kvm' id='50'>
-   <name>edge2</name>
+   <name>$GW_NAME</name>
    <memory unit='MB'>$BR_RAM</memory>
    <currentMemory unit='MB'>$BR_RAM</currentMemory>
    <vcpu placement='static'>$BR_CPU</vcpu>
@@ -173,7 +174,7 @@ EOF
 
 # Define and Start VM as the non-sudo user
 su - "$REAL_USER" -c "virsh --connect qemu:///system define /home/infiot/kvm/edge.xml"
-su - "$REAL_USER" -c "virsh --connect qemu:///system start edge2"
+su - "$REAL_USER" -c "virsh --connect qemu:///system start $GW_NAME"
 
 # Set default virsh URI for the user so they do not need to use sudo to see the VM
 su - "$REAL_USER" -c "grep -q 'LIBVIRT_DEFAULT_URI' ~/.bashrc || echo \"export LIBVIRT_DEFAULT_URI='qemu:///system'\" >> ~/.bashrc"
@@ -184,7 +185,7 @@ echo ""
 echo "=========================================="
 echo "         AUTO_DEPLOY COMPLETE!            "
 echo "=========================================="
-echo "Your Edge2 VM has been created and started."
+echo "Your $GW_NAME VM has been created and started."
 echo "Bridge Internal IP : $BR_IP"
 echo "Server Public IP   : $PUBLIC_IP"
 echo ""
