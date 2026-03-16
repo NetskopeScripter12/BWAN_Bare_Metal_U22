@@ -35,7 +35,7 @@ ls -l /etc/netplan/
 
 5) Execute the script in sudouser
 ```bash
-./BWAN_Setup.sh
+sudo ./BWAN_Setup.sh
 ```
 ***NOTE***: If you receive an interpreter error, run the following command to normalize translation
 ```bash
